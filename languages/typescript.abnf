@@ -1,0 +1,12 @@
+function ::= 'function' IDENTIFIER '(' [arguments] ')' [typeDeclaration] block;
+S ::= function;
+arguments ::= argument [additionalArguments];
+additionalArguments ::= ',' argument [additionalArguments];
+argument ::= IDENTIFIER typeDeclaration | IDENTIFIER;
+block ::= '{' { statement } '}';
+type ::= 'boolean' | 'string' | 'number';
+typeDeclaration ::= ':' type;
+statement ::= 'return' expression [';'];
+literal ::= '"' LITERAL '"' | LITERAL | 'true' | 'false';
+expression ::= IDENTIFIER | literal | expression operator expression;
+operator ::= '+' | '-' | '===';
