@@ -4,15 +4,16 @@ newtype Grammar = Grammar [Rule]
 data Rule = Rule String Production
 newtype Production = Production [AlternativeTerm]
 newtype AlternativeTerm = AlternativeTerm [Term]
-data Term = Terminal String
-          | NonTerminal Rule
-          | Optional AlternativeTerm
-          | Group Production
-          | Many AlternativeTerm
-          | Many1 AlternativeTerm
-          | Repetition Int Term
-          | Identifier
-          | Literal
+data Term = Many PrimitiveTerm
+          | Many1 PrimitiveTerm
+          | Primitive PrimitiveTerm
+data PrimitiveTerm = Terminal String
+                   | NonTerminal Rule
+                   | Optional Production
+                   | Group Production
+                   | Repetition Int PrimitiveTerm
+                   | Identifier
+                   | Literal
 
 join :: Show a => String -> [a] -> String
 join _ [] = ""
@@ -32,12 +33,15 @@ instance Show AlternativeTerm where
     show (AlternativeTerm l) = join " " l
 
 instance Show Term where
+    show (Many p) = show p ++ "*"
+    show (Many1 p) = show p ++ "+"
+    show (Primitive p) = show p
+
+instance Show PrimitiveTerm where
     show (Terminal s) = "'" ++ s ++ "'"
     show (NonTerminal (Rule n _)) = n
     show (Optional p) = "[" ++ show p ++ "]"
     show (Group l) = "(" ++ show l ++ ")"
-    show (Many p) = show p ++ "*"
-    show (Many1 p) = show p ++ "+"
     show (Repetition n p) = show n ++ "*" ++ show p
     show Identifier = "IDENTIFIER"
     show Literal = "LITERAL"

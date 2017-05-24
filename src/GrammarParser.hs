@@ -1,9 +1,10 @@
 module GrammarParser where
 
 import Grammar
+import Debug.Trace
 
-import Text.Megaparsec (some, space, string, runParser, parseTest, char, printChar, alphaNumChar, (<|>), sepBy1, sepEndBy1)
-import Text.Megaparsec.String
+import Text.Megaparsec (some, space, string, runParser, parseTest, char, printChar, alphaNumChar, (<|>), sepBy1, sepEndBy1, try)
+import Text.Megaparsec.String (Parser)
 
 rule :: Parser Rule
 rule = do
@@ -22,33 +23,49 @@ alternativeTerm :: Parser AlternativeTerm
 alternativeTerm = space >> sepEndBy1 term space >>= return . AlternativeTerm
 
 term :: Parser Term
-term = terminal
---    <|> nonTerminal
-    <|> optional
---    <|> group
---    <|> many
-    <|> identifier
-    <|> literal
+term = (try many)
+   <|> (try many1)
+   <|> (primitiveTerm >>= return . Primitive)
 
-terminal :: Parser Term
+primitiveTerm :: Parser PrimitiveTerm
+primitiveTerm = terminal
+        <|> identifier
+        <|> literal
+        <|> optional
+--    <|> nonTerminal
+--    <|> group
+
+terminal :: Parser PrimitiveTerm
 terminal = do
     char '\''
     s <- some alphaNumChar
     char '\''
     return $ Terminal s
 
-optional :: Parser Term
+optional :: Parser PrimitiveTerm
 optional = do
     char '['
-    res <- alternativeTerm
+    res <- production
     char ']'
     return $ Optional res
 
-identifier :: Parser Term
+identifier :: Parser PrimitiveTerm
 identifier = string "IDENTIFIER" >> return Identifier
 
-literal :: Parser Term
+literal :: Parser PrimitiveTerm
 literal = string "LITERAL" >> return Literal
+
+many :: Parser Term
+many = do
+    res <- primitiveTerm
+    char '*'
+    return $ Many res
+
+many1 :: Parser Term
+many1 = do
+    res <- primitiveTerm
+    char '+'
+    return $ Many1 res
 
 parseFile :: String -> IO ()
 parseFile content = parseTest rule content
