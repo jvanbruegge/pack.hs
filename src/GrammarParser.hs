@@ -32,8 +32,8 @@ primitiveTerm = terminal
         <|> identifier
         <|> literal
         <|> optional
+        <|> group
 --    <|> nonTerminal
---    <|> group
 
 terminal :: Parser PrimitiveTerm
 terminal = do
@@ -48,6 +48,13 @@ optional = do
     res <- production
     char ']'
     return $ Optional res
+
+group :: Parser PrimitiveTerm
+group = do
+    char '('
+    res <- production
+    char ')'
+    return $ Group res
 
 identifier :: Parser PrimitiveTerm
 identifier = string "IDENTIFIER" >> return Identifier
