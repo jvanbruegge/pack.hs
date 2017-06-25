@@ -113,7 +113,7 @@ findInRules (x:xs) name =
     if name == n then NonTerminal x else findInRules xs name
 findInRules [] name = undefined
 
-parseFile :: String -> IO()
-parseFile content = case (parse grammar "" content) of
+parseFile :: String -> String -> IO()
+parseFile filename content = case (parse grammar filename content) of
                         Left err -> putStr (parseErrorPretty err)
                         Right x -> putStrLn $ show $ matchGrammar x

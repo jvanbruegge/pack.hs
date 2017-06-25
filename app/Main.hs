@@ -2,5 +2,8 @@ module Main where
 
 import GrammarParser (parseFile)
 
+file :: String
+file = "languages/typescript.abnf"
+
 main :: IO ()
-main = readFile "languages/typescript.abnf" >>= parseFile
+main = readFile file >>= parseFile file
