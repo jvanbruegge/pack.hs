@@ -1,10 +1,12 @@
 module GrammarParser where
 
 import Grammar
-import Debug.Trace
 
-import Text.Megaparsec (some, space, string, runParser, parseTest, char, printChar, alphaNumChar, (<|>), sepBy1, sepEndBy1, try)
+import Text.Megaparsec (some, space, oneOf, string, runParser, parse, char, newline, printChar, alphaNumChar, (<|>), sepBy1, sepEndBy1, try, parseErrorPretty)
 import Text.Megaparsec.String (Parser)
+
+grammar :: Parser Grammar
+grammar = sepEndBy1 rule (some newline) >>= return . Grammar
 
 rule :: Parser Rule
 rule = do
@@ -33,14 +35,22 @@ primitiveTerm = terminal
         <|> literal
         <|> optional
         <|> group
---    <|> nonTerminal
+        <|> nonTerminal
 
 terminal :: Parser PrimitiveTerm
 terminal = do
     char '\''
-    s <- some alphaNumChar
+    s <- terminalLiteral
     char '\''
     return $ Terminal s
+
+terminalLiteral :: Parser String
+terminalLiteral = some (
+            try (string "\\'")
+        <|> try (string "\\\\")
+        <|> (alphaNumChar >>= return . (:[]))
+        <|> (oneOf ['!', '"', '§', '$', '%', '&', '/', '(', ')', '=', '?', '{', '}', '[', ']', '`', '´', '+', '*', '~', '#', ',', ';', '.', ':', '-', '_', '@', ' '] >>= return . (:[]))
+        ) >>= return . concat
 
 optional :: Parser PrimitiveTerm
 optional = do
@@ -74,5 +84,33 @@ many1 = do
     char '+'
     return $ Many1 res
 
-parseFile :: String -> IO ()
-parseFile content = parseTest rule content
+nonTerminal :: Parser PrimitiveTerm
+nonTerminal = do
+    res <- some alphaNumChar
+    space
+    return $ NonTerminalName res
+
+matchGrammar :: Grammar -> Grammar
+matchGrammar (Grammar rules) = Grammar $ buildRules rules
+    where buildRules ((Rule name (Production terms)):xs) = (Rule name (Production $ buildAlternativeTerms terms)):(buildRules xs)
+          buildRules [] = []
+          buildAlternativeTerms ((AlternativeTerm terms):xs) = (AlternativeTerm $ buildTerms terms):(buildAlternativeTerms xs)
+          buildAlternativeTerms [] = []
+          buildTerms (x:xs) = (buildTerm x):(buildTerms xs)
+          buildTerms [] = []
+          buildTerm (Many term) = Many $ buildPrimitive term
+          buildTerm (Many1 term) = Many1 $ buildPrimitive term
+          buildTerm (Primitive term) = Primitive $ buildPrimitive term
+          buildPrimitive (NonTerminalName name) = findInRules rules name
+          buildPrimitive a = a
+
+findInRules :: [Rule] -> String -> PrimitiveTerm
+findInRules (x:xs) name =
+    let (Rule n _) = x in
+    if name == n then NonTerminal x else findInRules xs name
+findInRules [] name = undefined
+
+parseFile :: String -> IO()
+parseFile content = case (parse grammar "" content) of
+                        Left err -> putStr (parseErrorPretty err)
+                        Right x -> putStrLn $ show $ matchGrammar x

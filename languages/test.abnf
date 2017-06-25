@@ -1,1 +1,3 @@
-S ::= 'hello' ['world'] IDENTIFIER LITERAL | 'test' | [IDENTIFIER]* LITERAL+ | (IDENTIFIER LITERAL)+;
+S ::= 'hello' ['world'] IDENTIFIER LITERAL | 'test' | [IDENTIFIER]* LITERAL+ | (IDENTIFIER LITERAL)+ | test;
+
+test ::= 'hello world';
