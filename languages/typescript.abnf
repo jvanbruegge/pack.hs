@@ -1,9 +1,9 @@
-function ::= 'function' IDENTIFIER '(' [arguments] ')' [typeDeclaration] block;
 S ::= function;
+function ::= 'function' IDENTIFIER '(' [arguments] ')' [typeDeclaration] block;
 arguments ::= argument [additionalArguments];
 additionalArguments ::= ',' argument [additionalArguments];
 argument ::= IDENTIFIER typeDeclaration | IDENTIFIER;
-block ::= '{' { statement } '}';
+block ::= '{' statement* '}';
 type ::= 'boolean' | 'string' | 'number';
 typeDeclaration ::= ':' type;
 statement ::= 'return' expression [';'];

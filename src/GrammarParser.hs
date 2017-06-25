@@ -102,6 +102,9 @@ matchGrammar (Grammar rules) = Grammar $ buildRules rules
           buildTerm (Many1 term) = Many1 $ buildPrimitive term
           buildTerm (Primitive term) = Primitive $ buildPrimitive term
           buildPrimitive (NonTerminalName name) = findInRules rules name
+          buildPrimitive (Optional (Production terms)) = Optional $ Production $ buildAlternativeTerms terms
+          buildPrimitive (Group (Production terms)) = Group $ Production $ buildAlternativeTerms terms
+          buildPrimitive (Repetition i term) = Repetition i $ buildPrimitive term
           buildPrimitive a = a
 
 findInRules :: [Rule] -> String -> PrimitiveTerm

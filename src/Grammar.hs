@@ -41,7 +41,7 @@ instance Show Term where
 instance Show PrimitiveTerm where
     show (Terminal s) = "'" ++ s ++ "'"
     show (NonTerminal (Rule n _)) = n
-    show (NonTerminalName _) = undefined
+    show (NonTerminalName s) = "**DEBUG**" ++ s ++ "**DEBUG**"
     show (Optional p) = "[" ++ show p ++ "]"
     show (Group l) = "(" ++ show l ++ ")"
     show (Repetition n p) = show n ++ "*" ++ show p

@@ -1,7 +1,6 @@
 module Main where
 
-import Lib
-import GrammarParser
+import GrammarParser (parseFile)
 
 main :: IO ()
-main = readFile "languages/test.abnf" >>= parseFile
+main = readFile "languages/typescript.abnf" >>= parseFile
