@@ -1,0 +1,25 @@
+Node "AlternativeTerm" [
+	Node "AlternativeTerm" [
+		Node "function" [],
+		Node "foo" [],
+		Node "(" [],
+		Node "" [],
+		Node ")" [],
+		Node "" [],
+		Node "AlternativeTerm" [
+			Node "{" [],
+			Node "Many" [
+				Node "AlternativeTerm" [
+					Node "return" [],
+					Node "AlternativeTerm" [
+						Node "5" []
+					],
+					Node "AlternativeTerm" [
+						Node ";" []
+					]
+				]
+			],
+			Node "}" []
+		]
+	]
+]

@@ -8,8 +8,7 @@ data Term = Many PrimitiveTerm
           | Many1 PrimitiveTerm
           | Primitive PrimitiveTerm
 data PrimitiveTerm = Terminal String
-                   | NonTerminal Rule
-                   | NonTerminalName String --Internal only
+                   | NonTerminal String
                    | Optional Production
                    | Group Production
                    | Repetition Int PrimitiveTerm
@@ -40,8 +39,7 @@ instance Show Term where
 
 instance Show PrimitiveTerm where
     show (Terminal s) = "'" ++ s ++ "'"
-    show (NonTerminal (Rule n _)) = n
-    show (NonTerminalName s) = "**DEBUG**" ++ s ++ "**DEBUG**"
+    show (NonTerminal s) = s
     show (Optional p) = "[" ++ show p ++ "]"
     show (Group l) = "(" ++ show l ++ ")"
     show (Repetition n p) = show n ++ "*" ++ show p

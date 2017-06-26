@@ -4,6 +4,8 @@ import Grammar
 
 import Text.Megaparsec (some, space, oneOf, string, runParser, parse, char, newline, printChar, alphaNumChar, (<|>), sepBy1, sepEndBy1, try, parseErrorPretty)
 import Text.Megaparsec.String (Parser)
+import Text.Megaparsec.Error (ParseError, Dec)
+import Text.Megaparsec.Prim (Token)
 
 grammar :: Parser Grammar
 grammar = sepEndBy1 rule (some newline) >>= return . Grammar
@@ -88,32 +90,9 @@ nonTerminal :: Parser PrimitiveTerm
 nonTerminal = do
     res <- some alphaNumChar
     space
-    return $ NonTerminalName res
+    return $ NonTerminal res
 
-matchGrammar :: Grammar -> Grammar
-matchGrammar (Grammar rules) = Grammar $ buildRules rules
-    where buildRules ((Rule name (Production terms)):xs) = (Rule name (Production $ buildAlternativeTerms terms)):(buildRules xs)
-          buildRules [] = []
-          buildAlternativeTerms ((AlternativeTerm terms):xs) = (AlternativeTerm $ buildTerms terms):(buildAlternativeTerms xs)
-          buildAlternativeTerms [] = []
-          buildTerms (x:xs) = (buildTerm x):(buildTerms xs)
-          buildTerms [] = []
-          buildTerm (Many term) = Many $ buildPrimitive term
-          buildTerm (Many1 term) = Many1 $ buildPrimitive term
-          buildTerm (Primitive term) = Primitive $ buildPrimitive term
-          buildPrimitive (NonTerminalName name) = findInRules rules name
-          buildPrimitive (Optional (Production terms)) = Optional $ Production $ buildAlternativeTerms terms
-          buildPrimitive (Group (Production terms)) = Group $ Production $ buildAlternativeTerms terms
-          buildPrimitive (Repetition i term) = Repetition i $ buildPrimitive term
-          buildPrimitive a = a
-
-findInRules :: [Rule] -> String -> PrimitiveTerm
-findInRules (x:xs) name =
-    let (Rule n _) = x in
-    if name == n then NonTerminal x else findInRules xs name
-findInRules [] name = undefined
-
-parseFile :: String -> String -> IO()
+parseFile :: String -> String -> Either String Grammar
 parseFile filename content = case (parse grammar filename content) of
-                        Left err -> putStr (parseErrorPretty err)
-                        Right x -> putStrLn $ show $ matchGrammar x
+         Left err -> Left $ parseErrorPretty err
+         Right xs -> Right xs
