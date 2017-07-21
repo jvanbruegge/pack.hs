@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Grammar, GrammarParser
+  exposed-modules:     Grammar, GrammarParser, AST
   build-depends:       base >= 4.7 && < 5
                      , megaparsec == 5.2.0
                      , text
