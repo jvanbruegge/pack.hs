@@ -1,1 +1,3 @@
-function foo() { return 5; }
+function foo() : number {
+    return 5;
+}
