@@ -15,11 +15,17 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src, src/transformers
-  exposed-modules:     Grammar, GrammarParser, AST, Typescript, Transform
+  exposed-modules:     Grammar
+                     , GrammarParser
+                     , AST
+                     , Typescript
+                     , Transform
+                     , Obfuscate
   build-depends:       base >= 4.7 && < 5
                      , megaparsec == 5.2.0
                      , text
                      , filepath == 1.4.1.1
+                     , mtl == 2.2.1
   default-language:    Haskell2010
 
 executable pack-hs-exe
