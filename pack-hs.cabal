@@ -14,8 +14,8 @@ extra-source-files:  README.md
 cabal-version:       >=1.10
 
 library
-  hs-source-dirs:      src
-  exposed-modules:     Grammar, GrammarParser, AST
+  hs-source-dirs:      src, src/transformers
+  exposed-modules:     Grammar, GrammarParser, AST, Typescript, Transform
   build-depends:       base >= 4.7 && < 5
                      , megaparsec == 5.2.0
                      , text
